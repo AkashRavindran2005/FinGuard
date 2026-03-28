@@ -99,6 +99,31 @@ def evaluate_rules(portfolio: Portfolio, rules: List[Rule]) -> List[Rule]:
                         )
                         break
 
+        elif rule.rule_type == RuleType.CUSTOM_AI:
+            # For custom AI rules: use AI service to evaluate the rule description against news/portfolio
+            # This allows truly custom, news-aware rules (e.g. "Alert if news shows tech volatility and portfolio >40% tech")
+            from ai_service import evaluate_macro_ai_rules
+            from news_service import get_latest_news
+            try:
+                news = get_latest_news(max_articles=5)
+                ai_result = evaluate_macro_ai_rules(portfolio, news, custom_prompt=rule.description)
+                if ai_result:
+                    rule.triggered = True
+                    rule.trigger_message = ai_result
+            except Exception as e:
+                # Fallback to sector concentration if AI fails
+                target_sector = (rule.target or "").strip().lower()
+                for sector, weight in sector_weights.items():
+                    sector_norm = sector.strip().lower()
+                    if target_sector and target_sector not in sector_norm:
+                        continue
+                    if weight > rule.threshold:
+                        rule.triggered = True
+                        rule.trigger_message = (
+                            f"{sector} concentration is {weight:.1f}% which exceeds custom AI threshold {rule.threshold}%"
+                        )
+                        break
+
         elif rule.rule_type == RuleType.AUTO_REBALANCE:
             # Alert if any asset has drifted > threshold % from its target weight
             avg_weight = 100.0 / len(assets) if assets else 0

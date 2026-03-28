@@ -8,6 +8,15 @@
   }
 }
 
+@layer utilities {
+  .text-muted-light {
+    @apply text-slate-600;
+  }
+  .text-muted {
+    @apply text-slate-500;
+  }
+}
+
 /* Minimal custom scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 6px;

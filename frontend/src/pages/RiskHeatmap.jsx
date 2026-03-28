@@ -60,16 +60,20 @@ export default function RiskHeatmap() {
 
   return (
     <div className="animate-in fade-in duration-500 pb-32">
-      <div className="bg-card rounded-[3rem] p-10 shadow-sm border border-border mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-background/40 to-white/10 backdrop-blur-3xl pointer-events-none" />
-        <div className="relative z-10 w-full md:w-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-accent/10 p-3 rounded-2xl text-accent"><ShieldAlert className="w-8 h-8" /></div>
-            <h1 className="text-4xl font-semibold tracking-tight text-primary">Risk Intelligence</h1>
+      <section className="relative w-full rounded-[3rem] overflow-hidden mb-10 flex flex-col items-start justify-end px-6 md:px-12 py-16 shadow-card bg-card min-h-[400px]">
+        <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: `url('/hero_landscape.png')` }} />
+        <div className="absolute inset-0 z-0 bg-white/30 backdrop-blur-[2px]" />
+        
+        <div className="relative z-10 max-w-3xl flex flex-col items-start bg-white/60 backdrop-blur-md rounded-[2rem] p-8 shadow-sm border border-white/60 w-full mt-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <ShieldAlert className="w-8 h-8 text-primary" />
+            <h1 className="text-4xl lg:text-5xl font-semibold tracking-tight text-primary">Risk Intelligence</h1>
           </div>
-          <p className="text-primary/70 text-lg font-medium leading-relaxed">Multi-dimensional exposure mapping and systemic risk analysis</p>
+          <p className="text-lg text-primary/80 font-medium leading-relaxed max-w-xl mb-4">
+            Multi-dimensional exposure mapping and systemic risk analysis
+          </p>
         </div>
-      </div>
+      </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <Card className="border-t-[6px] border-t-primary border-x-0 border-b-0 bg-card shadow-sm rounded-[2rem] p-8">
@@ -79,6 +83,9 @@ export default function RiskHeatmap() {
           </div>
           <div className="text-5xl font-semibold text-primary tracking-tight">{risk?.overall_score?.toFixed(1) ?? '–'}</div>
           <div className="text-sm font-medium text-muted-light mt-3">Maximum: 100.0</div>
+          <div className="text-xs text-muted-light mt-2 leading-relaxed">
+            Weighted average of volatility, concentration, and sector risks. Lower scores indicate safer portfolios.
+          </div>
         </Card>
         
         <Card className="border-t-[6px] border-t-amber-500 border-x-0 border-b-0 bg-card shadow-sm rounded-[2rem] p-8">
@@ -88,6 +95,9 @@ export default function RiskHeatmap() {
           </div>
           <div className="text-5xl font-semibold text-amber-500 tracking-tight">{risk?.concentration_index?.toFixed(0) ?? '–'}</div>
           <div className="text-sm font-medium text-muted-light mt-3">HHI Measurement</div>
+          <div className="text-xs text-muted-light mt-2 leading-relaxed">
+            Herfindahl-Hirschman Index. 0-10,000 scale. Higher = more concentrated (riskier). Current: {((risk?.concentration_index || 0) / 100).toFixed(1)}x average.
+          </div>
         </Card>
 
         <Card className="border-t-[6px] border-x-0 border-b-0 bg-card shadow-sm rounded-[2rem] p-8" style={{ borderTopColor: GRADE_COLORS[risk?.grade || 'B'] }}>
@@ -97,6 +107,9 @@ export default function RiskHeatmap() {
           </div>
           <div className="text-5xl font-semibold tracking-tight" style={{ color: GRADE_COLORS[risk?.grade || 'B'] }}>{risk?.grade || '–'}</div>
           <div className="text-sm font-medium text-muted-light mt-3">Assigned Grade</div>
+          <div className="text-xs text-muted-light mt-2 leading-relaxed">
+            A: &lt;25 risk score, B: 25-40, C: 40-60, D: 60-80, F: &gt;80. Based on volatility and concentration thresholds.
+          </div>
         </Card>
 
         <Card className="border-t-[6px] border-t-emerald-500 border-x-0 border-b-0 bg-card shadow-sm rounded-[2rem] p-8">
@@ -106,6 +119,9 @@ export default function RiskHeatmap() {
           </div>
           <div className="text-5xl font-semibold text-emerald-600 tracking-tight">{risk?.sharpe_ratio?.toFixed(2) ?? '–'}</div>
           <div className="text-sm font-medium text-muted-light mt-3">Risk/Reward Scalar</div>
+          <div className="text-xs text-muted-light mt-2 leading-relaxed">
+            Expected return per unit of risk. &gt;1.0 excellent, 0.5-1.0 good, &lt;0.5 needs review. Assumes 3% risk-free rate.
+          </div>
         </Card>
       </div>
 
@@ -114,6 +130,9 @@ export default function RiskHeatmap() {
           <CardHeader className="p-0 mb-6">
             <CardTitle className="text-xl">Systemic Profile Matrix</CardTitle>
           </CardHeader>
+          <div className="text-sm text-muted-light mb-4 leading-relaxed">
+            Multi-dimensional risk assessment across key portfolio dimensions. Each axis represents a different risk factor, normalized to 0-100 scale for comparison.
+          </div>
           <div className="h-[280px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
@@ -123,12 +142,22 @@ export default function RiskHeatmap() {
               </RadarChart>
             </ResponsiveContainer>
           </div>
+          <div className="mt-4 text-xs text-muted-light space-y-1">
+            <div>• Volatility: Annualized std dev of portfolio returns</div>
+            <div>• Concentration: Herfindahl-Hirschman Index (0-10k)</div>
+            <div>• Sector Risk: Highest individual sector risk score</div>
+            <div>• Drawdown: Max historical loss potential (x2 for scaling)</div>
+            <div>• Yield Gap: Risk-free rate vs portfolio yield differential</div>
+          </div>
         </Card>
 
         <Card className="p-8 rounded-[2rem] border-none shadow-sm">
           <CardHeader className="p-0 mb-6">
             <CardTitle className="text-xl">Peak Sector Exposure</CardTitle>
           </CardHeader>
+          <div className="text-sm text-muted-light mb-4 leading-relaxed">
+            Sector allocation breakdown showing your top 5 sectors by weight. Diversification across sectors reduces concentration risk.
+          </div>
           <div className="h-[280px] w-full mt-4">
             {barData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-muted-light text-sm">Sector decomposition unavailable</div>
@@ -152,6 +181,12 @@ export default function RiskHeatmap() {
               </ResponsiveContainer>
             )}
           </div>
+          <div className="mt-4 text-xs text-muted-light">
+            <div className="font-medium mb-1">Diversification Evidence:</div>
+            <div>• Top sector: {barData[0]?.name || 'N/A'} at {barData[0]?.value?.toFixed(1) || '0'}%</div>
+            <div>• Sectors >20%: {barData.filter(d => d.value > 20).length} (high concentration risk)</div>
+            <div>• Equal weight would be: {(100 / (portfolio?.assets?.length || 1)).toFixed(1)}% per asset</div>
+          </div>
         </Card>
       </div>
 
@@ -160,30 +195,38 @@ export default function RiskHeatmap() {
         <Card className="lg:col-span-1 p-8 rounded-[2rem] border-none shadow-sm h-full">
           <CardHeader className="p-0 mb-6 flex flex-row items-center border-b-0">
             <CardTitle className="text-xl flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-red-500" />
-              Systemic Alerts
+              <ShieldAlert className="w-5 h-5 text-red-600" />
+              Portfolio Alerts
             </CardTitle>
           </CardHeader>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {(!risk?.alerts || risk.alerts.length === 0) ? (
-              <div className="text-muted-light text-sm italic">No active structural alerts. Portfolio is balanced.</div>
+              <div className="text-muted-light text-sm italic px-4 py-6 bg-emerald-50/50 rounded-xl border border-emerald-200/50">
+                ✓ Portfolio is well-balanced. No critical alerts.
+              </div>
             ) : (
               risk.alerts.map((alert, i) => (
-                <div key={i} className="bg-red-500/10 text-red-600 px-4 py-3 rounded-xl text-sm font-medium border border-red-500/20">
-                  {alert}
-                </div>
+                <Alert key={i} type="danger" className="rounded-xl border-2 border-red-400 bg-red-50 shadow-sm">
+                  <div className="flex items-start gap-2">
+                    <span className="text-base font-bold">⚠️</span>
+                    <span className="text-sm font-semibold text-red-900">{alert}</span>
+                  </div>
+                </Alert>
               ))
             )}
           </div>
         </Card>
 
-        <Card className="lg:col-span-2 p-0 rounded-[2rem] border-border shadow-sm overflow-hidden h-full">
-          <CardHeader className="p-8 border-b border-border/50 mb-0 bg-transparent">
+        <Card className="lg:col-span-2 p-0 rounded-[3rem] bg-card border border-border shadow-sm overflow-hidden h-full">
+          <CardHeader className="p-10 pb-6 border-b border-border/50 mb-0 bg-transparent">
             <CardTitle className="text-xl flex items-center gap-2">
               <Layers className="w-5 h-5 text-primary opacity-70" />
               Asset Risk Matrix
             </CardTitle>
           </CardHeader>
+          <div className="px-10 pb-6 text-sm text-muted-light leading-relaxed">
+            Individual asset risk assessment based on historical volatility and portfolio contribution. Risk scores are calculated using annualized standard deviation of returns, weighted by position size.
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="text-[11px] text-muted-light uppercase font-bold tracking-wider bg-transparent">
@@ -192,6 +235,7 @@ export default function RiskHeatmap() {
                   <th className="px-6 py-4 border-b border-border">Weight</th>
                   <th className="px-6 py-4 border-b border-border">Volatility (Ann)</th>
                   <th className="px-8 py-4 border-b border-border text-right">Risk Score</th>
+                  <th className="px-6 py-4 border-b border-border text-center">Risk Level</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -208,18 +252,111 @@ export default function RiskHeatmap() {
                         </div>
                       </div>
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      <Badge 
+                        className={`text-xs font-bold px-2 py-1 rounded-full ${
+                          a.risk_score < 25 ? 'bg-emerald-100 text-emerald-800' :
+                          a.risk_score < 50 ? 'bg-amber-100 text-amber-800' :
+                          'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {a.risk_score < 25 ? 'Low' : a.risk_score < 50 ? 'Medium' : 'High'}
+                      </Badge>
+                    </td>
                   </tr>
                 ))}
                 {(!risk?.asset_risks || risk.asset_risks.length === 0) && (
                   <tr>
-                    <td colSpan="4" className="px-8 py-8 text-center text-muted-light italic">No asset data available.</td>
+                    <td colSpan="5" className="px-8 py-8 text-center text-muted-light italic">No asset data available.</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+          <div className="px-10 py-6 bg-background/50 border-t border-border/50">
+            <div className="text-xs text-muted-light space-y-1">
+              <div className="font-medium">Risk Score Methodology:</div>
+              <div>• Calculated as: (Asset Volatility × Weight) + Sector Risk Premium</div>
+              <div>• Historical data: 6-month lookback period for volatility</div>
+              <div>• Risk levels: Low (&lt;25), Medium (25-50), High (&gt;50)</div>
+              <div>• Portfolio contribution: {((risk?.asset_risks || []).reduce((sum, a) => sum + a.risk_score, 0) / (risk?.asset_risks?.length || 1)).toFixed(1)} avg risk score</div>
+            </div>
+          </div>
         </Card>
       </div>
+
+      {/* Detailed Risk Evidence Section */}
+      <Card className="p-8 rounded-[3rem] border-none shadow-sm bg-gradient-to-br from-background to-background/50">
+        <CardHeader className="p-0 mb-8">
+          <CardTitle className="text-2xl flex items-center gap-3">
+            <ShieldAlert className="w-6 h-6 text-primary" />
+            Risk Assessment Evidence
+          </CardTitle>
+        </CardHeader>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-lg font-semibold text-primary mb-3">Portfolio Composition Analysis</h4>
+              <div className="space-y-2 text-sm text-muted-light">
+                <div>• Total assets: {portfolio?.assets?.length || 0}</div>
+                <div>• Total value: ${(portfolio?.total_value || 0).toLocaleString()}</div>
+                <div>• Sectors represented: {new Set(portfolio?.assets?.map(a => a.sector)).size}</div>
+                <div>• Largest position: {Math.max(...(portfolio?.assets?.map(a => a.weight) || [0])).toFixed(1)}%</div>
+                <div>• Equal weight benchmark: {(100 / (portfolio?.assets?.length || 1)).toFixed(1)}%</div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-primary mb-3">Risk Calculation Methodology</h4>
+              <div className="space-y-2 text-sm text-muted-light">
+                <div>• Volatility: Annualized std dev of 6-month historical returns</div>
+                <div>• Sharpe Ratio: (Expected Return - Risk-Free Rate) / Volatility</div>
+                <div>• HHI Concentration: Σ(weight²) × 10,000 (0-10,000 scale)</div>
+                <div>• Max Drawdown: Peak-to-trough decline in portfolio value</div>
+                <div>• Risk Grade: A (0-25), B (25-40), C (40-60), D (60-80), F (80+)</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-lg font-semibold text-primary mb-3">Key Risk Indicators</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-card rounded-xl border border-border/50">
+                  <span className="text-sm font-medium">Volatility Threshold</span>
+                  <Badge className={`${(risk?.volatility_annual || 0) > 25 ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                    {(risk?.volatility_annual || 0) > 25 ? 'High' : 'Acceptable'} ({(risk?.volatility_annual || 0).toFixed(1)}%)
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-card rounded-xl border border-border/50">
+                  <span className="text-sm font-medium">Concentration Risk</span>
+                  <Badge className={`${(risk?.concentration_index || 0) > 1500 ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                    {(risk?.concentration_index || 0) > 1500 ? 'High' : 'Acceptable'} (HHI: {(risk?.concentration_index || 0)})
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-card rounded-xl border border-border/50">
+                  <span className="text-sm font-medium">Sharpe Ratio</span>
+                  <Badge className={`${(risk?.sharpe_ratio || 0) < 0.5 ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                    {(risk?.sharpe_ratio || 0) < 0.5 ? 'Needs Review' : 'Good'} ({(risk?.sharpe_ratio || 0).toFixed(2)})
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-lg font-semibold text-primary mb-3">Recommendations</h4>
+              <div className="space-y-2 text-sm text-muted-light">
+                {(risk?.overall_score || 0) > 60 && <div>• Consider reducing exposure to high-volatility assets</div>}
+                {(risk?.concentration_index || 0) > 2000 && <div>• Diversify across more sectors to reduce concentration</div>}
+                {(risk?.sharpe_ratio || 0) < 0.5 && <div>• Review asset selection for better risk-adjusted returns</div>}
+                {(risk?.alerts || []).length > 0 && <div>• Address the {risk.alerts.length} active risk alerts</div>}
+                {((risk?.alerts || []).length === 0 && (risk?.overall_score || 0) < 40) && <div>• ✓ Portfolio shows good risk management practices</div>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
 
     </div>
   );

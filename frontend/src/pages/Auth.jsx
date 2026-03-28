@@ -46,7 +46,7 @@ export default function Auth() {
       <div className="absolute bottom-0 -left-20 w-[600px] h-[600px] bg-info/20 rounded-full blur-[120px] opacity-60 mix-blend-multiply" />
 
       <div className="w-full max-w-md relative z-10">
-        <div className="bg-card/70 backdrop-blur-2xl border border-white p-10 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(28,27,47,0.1)] relative overflow-hidden">
+        <div className="bg-card/70 backdrop-blur-2xl border border-white p-10 rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(28,27,47,0.1)] relative overflow-hidden">
           
           {/* Subtle top reflection */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />

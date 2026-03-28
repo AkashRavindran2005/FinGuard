@@ -103,25 +103,29 @@ export default function RulesEngine() {
 
   return (
     <div className="animate-in fade-in duration-500 pb-32">
-      <div className="bg-card rounded-[3rem] p-10 shadow-sm border border-border mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-background/40 to-white/10 backdrop-blur-3xl pointer-events-none" />
-        <div className="relative z-10 w-full md:w-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-accent/10 p-3 rounded-2xl text-accent"><Settings className="w-8 h-8" /></div>
-            <h1 className="text-4xl font-semibold tracking-tight text-primary">Rules Engine</h1>
+      <section className="relative w-full rounded-[3rem] overflow-hidden mb-10 flex flex-col items-start justify-end px-6 md:px-12 py-16 shadow-card bg-card min-h-[400px]">
+        <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: `url('/hero_landscape.png')` }} />
+        <div className="absolute inset-0 z-0 bg-white/30 backdrop-blur-[2px]" />
+        
+        <div className="relative z-10 max-w-3xl flex flex-col items-start bg-white/60 backdrop-blur-md rounded-[2rem] p-8 shadow-sm border border-white/60 w-full mt-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <Settings className="w-8 h-8 text-primary" />
+            <h1 className="text-4xl lg:text-5xl font-semibold tracking-tight text-primary">Rules Engine</h1>
           </div>
-          <p className="text-primary/70 text-lg font-medium leading-relaxed">Configure and enforce algorithmic financial discipline</p>
+          <p className="text-lg text-primary/80 font-medium leading-relaxed max-w-xl mb-8">
+            Configure and enforce algorithmic financial discipline
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button onClick={handleEvaluate} disabled={evaluating} className="shadow-md min-w-[160px] rounded-full px-6 py-4 font-bold text-base">
+              {evaluating ? <CircleDot className="w-5 h-5 animate-spin mr-2" /> : <Play className="w-5 h-5 mr-2" />}
+              {evaluating ? 'Processing...' : 'Run Evaluation'}
+            </Button>
+            <Button variant="outline" onClick={() => { setEditId(null); setForm({ name: '', rule_type: 'sector_cap', threshold: '', description: '', target: '' }); setShowForm(v => !v); }} className="rounded-full px-6 py-4 border-border font-bold text-base shadow-sm bg-white hover:bg-background">
+              {showForm ? 'Cancel Registration' : 'Register New Rule'}
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-3 relative z-10 w-full md:w-auto justify-end">
-          <Button onClick={handleEvaluate} disabled={evaluating} className="shadow-md min-w-[160px] rounded-full px-6 py-6 font-bold text-base">
-            {evaluating ? <CircleDot className="w-5 h-5 animate-spin mr-2" /> : <Play className="w-5 h-5 mr-2" />}
-            {evaluating ? 'Running Protocol...' : 'Run Evaluation'}
-          </Button>
-          <Button variant="outline" onClick={() => { setEditId(null); setForm({ name: '', rule_type: 'sector_cap', threshold: '', description: '', target: '' }); setShowForm(v => !v); }} className="rounded-full px-6 py-6 border-border font-bold text-base">
-            {showForm ? 'Cancel Registration' : 'Register New Rule'}
-          </Button>
-        </div>
-      </div>
+      </section>
 
       {error && <Alert type="danger" className="mb-6">{error}</Alert>}
 
@@ -149,11 +153,11 @@ export default function RulesEngine() {
       )}
 
       {alerts.length > 0 && (
-        <div className="mb-10 space-y-3 animate-in fade-in duration-500">
-          <h3 className="text-xs font-bold text-red-600 tracking-widest uppercase mb-4 flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4" /> Priority Alerts ({alerts.length})
+        <div className="mb-10 space-y-3 animate-in slide-in-from-top-4 duration-500 p-6 bg-gradient-to-r from-red-50 to-red-100 rounded-[2rem] border-2 border-red-400 shadow-lg">
+          <h3 className="text-sm font-bold text-red-900 tracking-widest uppercase mb-4 flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-red-600" /> 🚨 Rule Violations ({alerts.length})
           </h3>
-          {alerts.map((a, i) => <Alert key={i} type="danger" className="border-red-900/50 bg-red-950/20">{a}</Alert>)}
+          {alerts.map((a, i) => <Alert key={i} type="danger" className="border-2 border-red-400 bg-white shadow-sm rounded-xl font-semibold"><span>⚠️ {a}</span></Alert>)}
         </div>
       )}
 
