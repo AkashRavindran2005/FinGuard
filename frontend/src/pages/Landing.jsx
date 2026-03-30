@@ -55,7 +55,7 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
             {/* Card 1: Large left card */}
-            <div className="md:col-span-12 lg:col-span-5 bg-card-violet rounded-[2.5rem] p-10 md:p-12 flex flex-col justify-between relative overflow-hidden min-h-[360px] max-h-[400px] shadow-sm">
+            <div className="md:col-span-12 lg:col-span-5 bg-card-violet rounded-[3rem] p-10 md:p-12 flex flex-col justify-between relative overflow-hidden min-h-[360px] max-h-[400px] shadow-sm">
               <div className="relative z-10 max-w-md">
                 <h3 className="text-3xl font-medium tracking-tight text-primary mb-4">Capital that grows</h3>
                 <p className="text-primary/70 font-medium leading-relaxed">Earn passive income as your portfolio is stress-tested against high-performing market simulations.</p>
@@ -64,7 +64,7 @@ export default function Landing() {
             </div>
 
             {/* Card 2: Small dark card */}
-            <div className="md:col-span-6 lg:col-span-4 bg-card-dark text-white rounded-[2.5rem] p-10 flex flex-col justify-between min-h-[360px] max-h-[400px] shadow-card hover:shadow-card-hover transition-shadow lg:w-full">
+            <div className="md:col-span-6 lg:col-span-4 bg-card-dark text-white rounded-[2rem] p-10 flex flex-col justify-between min-h-[360px] max-h-[400px] shadow-card hover:shadow-card-hover transition-shadow lg:w-full">
               <div className="max-w-xs">
                 <h3 className="text-2xl font-medium tracking-tight leading-snug">Always liquid,<br/>always stable</h3>
               </div>
@@ -72,7 +72,7 @@ export default function Landing() {
             </div>
             
             {/* Card 3: Small dark card */}
-            <div className="md:col-span-6 lg:col-span-3 bg-card-dark text-white rounded-[2.5rem] p-10 flex flex-col justify-between min-h-[360px] max-h-[400px] shadow-card hover:shadow-card-hover transition-shadow mx-auto w-full">
+            <div className="md:col-span-6 lg:col-span-3 bg-card-dark text-white rounded-[2rem] p-10 flex flex-col justify-between min-h-[360px] max-h-[400px] shadow-card hover:shadow-card-hover transition-shadow mx-auto w-full">
               <div className="max-w-xs">
                 <h3 className="text-2xl font-medium tracking-tight leading-snug">100%<br/>hands-free</h3>
               </div>

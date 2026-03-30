@@ -41,16 +41,20 @@ export default function SimulationLab() {
 
   return (
     <div className="animate-in fade-in duration-500 pb-32">
-      <div className="bg-card rounded-[3rem] p-10 shadow-sm border border-border mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-background/40 to-white/10 backdrop-blur-3xl pointer-events-none" />
-        <div className="relative z-10 w-full md:w-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-accent/10 p-3 rounded-2xl text-accent"><Activity className="w-8 h-8" /></div>
-            <h1 className="text-4xl font-semibold tracking-tight text-primary">Simulation Lab</h1>
+      <section className="relative w-full rounded-[3rem] overflow-hidden mb-10 flex flex-col items-start justify-end px-6 md:px-12 py-16 shadow-card bg-card min-h-[400px]">
+        <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: `url('/hero_landscape.png')` }} />
+        <div className="absolute inset-0 z-0 bg-white/30 backdrop-blur-[2px]" />
+        
+        <div className="relative z-10 max-w-3xl flex flex-col items-start bg-white/60 backdrop-blur-md rounded-[2rem] p-8 shadow-sm border border-white/60 w-full mt-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <Activity className="w-8 h-8 text-primary" />
+            <h1 className="text-4xl lg:text-5xl font-semibold tracking-tight text-primary">Simulation Lab</h1>
           </div>
-          <p className="text-primary/70 text-lg font-medium leading-relaxed">Stress-test algorithmic portfolios against extreme macro scenarios</p>
+          <p className="text-lg text-primary/80 font-medium leading-relaxed max-w-xl mb-4">
+            Stress-test algorithmic portfolios against extreme macro scenarios
+          </p>
         </div>
-      </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Controls Column */}
@@ -143,7 +147,7 @@ export default function SimulationLab() {
                 </Card>
               </div>
 
-              <Card className="p-8 rounded-[2rem] border-none shadow-sm">
+              <Card className="p-10 rounded-[3rem] border-none shadow-sm bg-card">
                 <CardHeader className="p-0 mb-6">
                   <CardTitle className="text-2xl tracking-tight">Monte Carlo Path Projection</CardTitle>
                 </CardHeader>
@@ -174,8 +178,8 @@ export default function SimulationLab() {
               </Card>
 
               {result.affected_assets && result.affected_assets.length > 0 && (
-                <Card className="overflow-hidden p-0">
-                  <CardHeader className="p-6 border-b border-border/50 mb-0 bg-red-50">
+                <Card className="overflow-hidden p-0 rounded-[3rem] border border-border shadow-sm">
+                  <CardHeader className="p-10 pb-6 border-b border-border/50 mb-0 bg-red-50">
                     <CardTitle className="text-red-600 flex items-center gap-2 pt-1.5"><AlertTriangle className="w-5 h-5"/> Highest Impact Liabilities</CardTitle>
                   </CardHeader>
                   <div className="overflow-x-auto">

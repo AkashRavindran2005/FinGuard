@@ -2,26 +2,41 @@ import os
 import json
 import logging
 import requests
+import time
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
 logger = logging.getLogger(__name__)
 
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
-# Using Zephyr 7B Beta for fast, robust inference (Mistral API deprecated)
-API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 
-def evaluate_macro_ai_rules(portfolio, news_headlines):
+# List of free-tier accessible HF models (frequently updated)
+HF_MODELS = [
+    "mistralai/Mistral-7B-Instruct-v0.1",
+    "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+    "meta-llama/Llama-2-13b-chat-hf",
+    "mistralai/Mixtral-8x7B-Instruct-v0.1"
+]
+
+_model_cache = {}
+
+def get_hf_api_url(model_index=0):
+    """Get HuggingFace API URL for the model."""
+    if model_index < len(HF_MODELS):
+        return f"https://api-inference.huggingface.co/models/{HF_MODELS[model_index]}"
+    return None
+
+def evaluate_macro_ai_rules(portfolio, news_headlines, custom_prompt=None):
     """
-    Evaluates the portfolio context against real-world news using Mistral AI.
-    Returns an alert message string if triggered, else None.
+    Evaluates the portfolio context against real-world news using HuggingFace models.
+    Returns an alert message string if triggered, else None gracefully.
+    If custom_prompt is provided, uses that instead of the default macro prompt.
     """
     if not HF_API_TOKEN:
-        logger.warning("No HF_API_TOKEN found in environment. Skipping AI evaluation.")
+        logger.debug("No HF_API_TOKEN configured. AI evaluation unavailable.")
         return None
 
     if not news_headlines:
-        logger.info("No news headlines fetched. Skipping AI evaluation.")
         return None
 
     if not portfolio.assets:
@@ -32,7 +47,10 @@ def evaluate_macro_ai_rules(portfolio, news_headlines):
     for a in portfolio.assets:
         portfolio_summary += f"- {a.ticker} ({a.name}, Sector: {a.sector}): {a.weight}%, Price: ${a.current_price}\n"
 
-    prompt = f"""[INST] You are an expert financial AI advisor. 
+    if custom_prompt:
+        prompt = custom_prompt.replace("{portfolio}", portfolio_summary).replace("{news}", '; '.join(news_headlines))
+    else:
+        prompt = f"""[INST] You are an expert financial AI advisor. 
 Current Breaking Global News:
 {'; '.join(news_headlines)}
 
@@ -63,35 +81,75 @@ Do not return any other text, markdown, or explanations outside the JSON object.
         }
     }
 
-    try:
-        response = requests.post(API_URL, headers=headers, json=payload, timeout=20)
-        response.raise_for_status()
-        result = response.json()
+    # Try multiple models with retry logic
+    for model_index in range(len(HF_MODELS)):
+        model_name = HF_MODELS[model_index]
         
-        if isinstance(result, list) and len(result) > 0:
-            generated_text = result[0].get("generated_text", "").strip()
-            
-            # Clean up potential markdown formatting code blocks returned by LLM
-            if generated_text.startswith("```json"):
-                generated_text = generated_text[7:]
-            if generated_text.startswith("```"):
-                generated_text = generated_text[3:]
-            if generated_text.endswith("```"):
-                generated_text = generated_text[:-3]
-                
-            generated_text = generated_text.strip()
-            
+        # Skip if we know this model is permanently unavailable
+        if _model_cache.get(f"{model_name}_failed", False):
+            continue
+        
+        api_url = f"https://api-inference.huggingface.co/models/{model_name}"
+        
+        for attempt in range(2):  # 2 attempts per model
             try:
-                data = json.loads(generated_text)
-                if data.get("triggered") and data.get("trigger_message"):
-                    return data.get("trigger_message")
-            except json.JSONDecodeError as je:
-                logger.error(f"Failed to parse JSON from AI response: {generated_text}. Error: {je}")
-                # Fallback: if it didn't output JSON but outputted text
-                if len(generated_text) > 20 and "{" not in generated_text:
-                    return f"AI Suggestion: {generated_text}"
-
-    except Exception as e:
-        logger.error(f"HF AI Evaluation failed: {e}")
-        
+                logger.debug(f"Calling {model_name} (attempt {attempt+1}/2)")
+                resp = requests.post(api_url, headers=headers, json=payload, timeout=25)
+                
+                # Handle auth/access issues
+                if resp.status_code in [401, 403]:
+                    logger.debug(f"Access denied for {model_name} (status {resp.status_code})")
+                    _model_cache[f"{model_name}_failed"] = True
+                    break
+                
+                # Model not available - try next one
+                if resp.status_code in [404, 410]:
+                    logger.debug(f"Model {model_name} unavailable (status {resp.status_code})")
+                    _model_cache[f"{model_name}_failed"] = True
+                    break
+                
+                # Unexpected error - retry
+                if resp.status_code != 200:
+                    logger.debug(f"Status {resp.status_code} from {model_name}, retrying...")
+                    if attempt == 0:
+                        time.sleep(1)
+                    continue
+                
+                # Parse successful response
+                result = resp.json()
+                if isinstance(result, list) and len(result) > 0:
+                    text = result[0].get("generated_text", "").strip()
+                    
+                    # Clean markdown
+                    for marker in ["```json", "```"]:
+                        text = text.replace(marker, "")
+                    text = text.strip()
+                    
+                    if custom_prompt:
+                        # For custom prompts, return the text directly if it looks like an alert
+                        if text and len(text) > 10:
+                            return text
+                    else:
+                        try:
+                            data = json.loads(text)
+                            if data.get("triggered") and data.get("trigger_message"):
+                                return data["trigger_message"]
+                        except json.JSONDecodeError:
+                            pass
+                
+                # Model worked but didn't give us useful output - try another
+                break
+                
+            except requests.exceptions.Timeout:
+                logger.debug(f"Timeout on {model_name} attempt {attempt+1}")
+                if attempt == 1:
+                    break
+                time.sleep(1)
+            except Exception as e:
+                logger.debug(f"Error with {model_name}: {e}")
+                if attempt == 0:
+                    time.sleep(1)
+    
+    # All models unavailable - gracefully return None
+    logger.debug("AI model evaluation skipped (models unavailable)")
     return None

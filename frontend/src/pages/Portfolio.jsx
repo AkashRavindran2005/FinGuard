@@ -134,25 +134,29 @@ export default function Portfolio() {
 
   return (
     <div className="animate-in fade-in duration-500 pb-32">
-      <div className="bg-card rounded-[3rem] p-10 shadow-sm border border-border mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-background/40 to-white/10 backdrop-blur-3xl pointer-events-none" />
-        <div className="relative z-10 w-full md:w-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-accent/10 p-3 rounded-2xl text-accent"><Briefcase className="w-8 h-8" /></div>
-            <h1 className="text-4xl font-semibold tracking-tight text-primary">Portfolio Builder</h1>
+      <section className="relative w-full rounded-[3rem] overflow-hidden mb-10 flex flex-col items-start justify-end px-6 md:px-12 py-16 shadow-card bg-card min-h-[400px]">
+        <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: `url('/hero_landscape.png')` }} />
+        <div className="absolute inset-0 z-0 bg-white/30 backdrop-blur-[2px]" />
+        
+        <div className="relative z-10 max-w-3xl flex flex-col items-start bg-white/60 backdrop-blur-md rounded-[2rem] p-8 shadow-sm border border-white/60 w-full mt-auto">
+          <div className="flex items-center gap-3 mb-4">
+            <Briefcase className="w-8 h-8 text-primary" />
+            <h1 className="text-4xl lg:text-5xl font-semibold tracking-tight text-primary">Portfolio Builder</h1>
           </div>
-          <p className="text-primary/70 text-lg font-medium leading-relaxed">Design, test, and manage algorithmic holdings</p>
+          <p className="text-lg text-primary/80 font-medium leading-relaxed max-w-xl mb-8">
+            Design, test, and manage algorithmic holdings
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="outline" className="rounded-full px-6 py-4 font-bold shadow-sm bg-white hover:bg-background border-border" onClick={handleRefresh} disabled={refreshing}>
+              <RefreshCw className={`w-5 h-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Sync Data
+            </Button>
+            <Button className="rounded-full px-6 py-4 font-bold shadow-sm" onClick={() => setShowForm(v => !v)}>
+              {showForm ? <><X className="w-5 h-5 mr-2" /> Cancel Builder</> : <><Plus className="w-5 h-5 mr-2" /> Register Asset</>}
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-4 relative z-10">
-          <Button variant="outline" className="rounded-[1.5rem] px-5 py-5 font-bold shadow-sm" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={`w-5 h-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh Data
-          </Button>
-          <Button className="rounded-[1.5rem] px-6 py-5 font-bold shadow-sm" onClick={() => setShowForm(v => !v)}>
-            {showForm ? <><X className="w-5 h-5 mr-2" /> Cancel</> : <><Plus className="w-5 h-5 mr-2" /> Add Asset</>}
-          </Button>
-        </div>
-      </div>
+      </section>
 
       {error && <Alert type="danger" className="mb-6">{error}</Alert>}
       {success && <Alert type="success" className="mb-6">{success}</Alert>}
@@ -289,8 +293,8 @@ export default function Portfolio() {
       </div>
 
       {/* Holdings table */}
-      <Card className="overflow-hidden p-0 rounded-[3rem] border border-border shadow-sm">
-        <CardHeader className="p-8 pb-6 bg-transparent flex flex-row items-center justify-between border-b border-border/50 mb-0">
+      <Card className="overflow-hidden p-0 rounded-[3rem] border border-border shadow-sm bg-card">
+        <CardHeader className="p-10 pb-6 bg-transparent flex flex-row items-center justify-between border-b border-border/50 mb-0">
           <div className="flex items-center gap-3">
             <CardTitle className="text-3xl font-medium tracking-tight">Current Ledger</CardTitle>
           </div>

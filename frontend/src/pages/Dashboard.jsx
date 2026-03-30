@@ -104,7 +104,34 @@ export default function Dashboard() {
 
   return (
     <div className="animate-in fade-in duration-500 font-sans pb-32">
-      {/* Premium Dashboard Header replacing the basic one */}
+      {/* ALERTS AT TOP - Most Prominent */}
+      {alerts.length > 0 && (
+        <div className="mb-8 px-2 space-y-3 animate-in slide-in-from-top-4 duration-500">
+          <div className="text-xs font-bold text-red-600/80 tracking-widest uppercase px-2">⚠️ Portfolio Attention Required</div>
+          {alerts.map((alert, i) => (
+            <Alert key={i} type="warning" className="max-w-full w-full border-2 border-amber-400 bg-gradient-to-r from-amber-50 to-amber-100 shadow-lg rounded-2xl">
+              <div className="flex items-start gap-3">
+                <span className="text-lg">⚡</span>
+                <span className="font-semibold text-amber-900">{alert}</span>
+              </div>
+            </Alert>
+          ))}
+        </div>
+      )}
+
+      {/* Risk Summary from backend */}
+      {riskSummary?.alerts && riskSummary.alerts.length > 0 && (
+        <div className="mb-8 px-2 space-y-3 animate-in slide-in-from-top-4 duration-500">
+          {riskSummary.alerts.map((alert, i) => (
+            <Alert key={`risk-${i}`} type="danger" className="max-w-full w-full border-2 border-red-400 bg-gradient-to-r from-red-50 to-red-100 shadow-lg rounded-2xl">
+              <div className="flex items-start gap-3">
+                <span className="text-lg">🚨</span>
+                <span className="font-semibold text-red-900">{alert}</span>
+              </div>
+            </Alert>
+          ))}
+        </div>
+      )}
       <section 
         className="relative w-full rounded-[3rem] overflow-hidden mb-8 flex flex-col items-start justify-end px-12 py-16 shadow-card bg-card min-h-[400px]"
       >
